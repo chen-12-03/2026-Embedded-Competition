@@ -1,0 +1,219 @@
+全国大学生嵌入式芯片与系统设计竞赛'2026
+芯片应用赛道选题指南
+英飞凌赛题目录
+一、 公司介绍 ........................................................................................................................ 1
+二、 竞赛技术平台 ................................................................................................................ 2
+三、 选题方向 ........................................................................................................................ 5
+四、 开发板获取途径 ............................................................................................................ 7
+五、 技术支持与技术资源 .................................................................................................... 9
+六、 其它 .............................................................................................................................. 11英飞凌赛题选题指南
+一、 公司介绍
+半导体对于应对当今时代的能源挑战和塑造数字化转型至关重要。正因如此，英
+飞凌致力于积极推动低碳化和数字化进程。作为全球功率系统和物联网领域的半导体
+领导者，我们助力打造引发行业变革的解决方案，以实现绿色高效的能源、环保安全
+的出行以及智能安全的物联网。我们让生活更加便利、安全和环保。携手我们的客户
+和合作伙伴，共同创造更加美好的未来。
+英飞凌在全球拥有约 57,000名员工(截至 2025年 9月底)，在 2025财年（截至 9月
+30 日）的营收约为 146.6 亿欧元。英飞凌在法兰克福证券交易所上市（股票代码：
+IFX），在美国的 OTCQX国际场外交易市场上市（股票代码：IFNNY）。
+更多信息请访问 www.infineon.com
+更多新闻请访问 https://www.infineon.com/cms/cn/aboutinfineon/press/market-news/
+企业额外奖励：英飞凌将从本届竞赛获奖队伍中评选产生两支企业杯队伍，并分
+别给予价值5000元左右的奖励。
+1英飞凌赛题选题指南
+二、 竞赛技术平台
+⚫ 主控PSOC ™ Edge
+PSOC Edge E84 是英飞凌推出的先进边缘 AI 微控制器，采用多域架构设计，专为
+高性能和低功耗的 AI/ML应用而优化。该器件集成了 400Mhz 主频的Arm Cortex-M55
+CPU、Helium DSP 和Ethos-U55 神经处理单元，提供高达 0.1TOPS的AI 计算能力，同
+时在低功耗域配备 200MHz 的 Cortex-M33 内核和 NNLite 加速器，支持始终在线的低
+功耗 AI 应用。为 M55 配备 5MB SRAM：SOCMEM，M33 配置 1MB SRAM，同时还支
+持外部扩展PSRAM跟Nor Flash等，用于适配不同的复杂的MCU + Edge AI应用场景。
+E84 支持丰富的 HMI 接口，包括低功耗 2.5D 图形处理器、MIPI-DSI/DBI 显示控制
+器（最高 1024x768 分辨率）、多麦克风音频接口：高达 6 路数字麦克风跟 4 路模拟麦
+克风，以及本地和云端语音处理功能，可以在语音 AI 方面适配不同的应用场景：如低
+功耗语音唤醒、多麦克风降噪、定位、远场唤醒等。在安全性方面，器件提供安全启
+动、密钥存储和加密操作，符合英飞凌边缘保护类别 4 标准，通过 ARM 的PSA L3，达
+到L4 的标准。
+英飞凌提供完整的开发生态系统支持，包括 ModusToolbox 软件平台和
+DEEPCRAFT Studio 边缘 AI 开发工具，可显著加速 AI 模型的开发和部署，为下一代物
+联网边缘设备提供强大的 AI 解决方案。
+PSoC Edge E84 凭借其集成的 AI 加速器、低功耗多域架构和丰富的 HMI 接口，可
+广泛应用于智能家居语音控制面板、工业预测性维护设备、智能穿戴健康监测、车载
+信息娱乐系统、人脸识别门禁、便携式医疗设备以及边缘计算网关等需要本地 AI 处理
+能力的场景，为从消费电子到工业物联网的各类应用提供高性能、安全可靠的边缘 AI
+解决方案。
+⚫ 主控PSoC™ 6
+PSoC™ 6 是一款基于 32 位 Arm® Cortex®-M4 和 Cortex®-M0+内核的微控制器
+系列，利用其双核架构，设计人员可以优化功耗和性能，来达到最佳的平衡。M4 核最
+大工作频率为 150MHz, M0+核最高工作频率为 100MHz。该系列基于超低功耗架构设
+计，适用于低功耗的应用场景。
+PSoC™ 6 有丰富的模拟和数字外设资源。数字外设包括：高达 8 路 SCB 和 1 路低
+功耗SCB(可配置成 SPI、I2C、UART)、PWM、USB、QSPI、LCD、SPI-TFT、 I2S 和PDM
+2英飞凌赛题选题指南
+等；模拟资源包括行业领先的 CAPSENSE™电容检测技术，可以实现稳定可靠的触摸按
+键、手势、滑条、接近感应等应用，以及 SAR ADC、DAC、内部运算放大器等；高达
+2MB 内置Flash 和 1MB SRAM。
+PSoC™ 6 MCU 可搭配英飞凌 AIROC™ Wi-Fi、AIROC™ Bluetooth®或AIROC™ Wi-
+Fi & Bluetooth® Combo 芯片，以及XENSIV Sensor 系列传感器，具有丰富的驱动和应
+用方案，适用于安全、低功耗、功能丰富的物联网产品。
+⚫ 主控平台XMC7000
+XMC7000系列包含双核（包含Arm® Cortex®-M7和Cortex®-M0+）或单核（仅
+Arm® Cortex®-M7）微处理器。其中 M7 核最高工作频率为 350MHz，M0+的最高工
+作频率为100MHz，拥有丰富的外设接口，比如高达10路的CAN FD，11路的SCB（可
+配置成 SPI、I2C、UART），高达 2 路 Ethernet，以及 PWM、I2S、SDIO、GPIO、SAR
+ADC 等。Flash 容量高达 8MB，SRAM 高达1MB。
+提供丰富的封装选项和-40℃ to 125℃的温度范围，适合各种工业应用场景。
+⚫ 其它推荐使用的选配无线方案：AIROC Wi-Fi & Bluetooth
+AIROC Wi-Fi，Bluetooth 以及 Wi-Bi+Bluetooth Combo 产品系列，是集成了
+802.11a/b/g/n/ac/ax Wi-Fi 和蓝牙 5.4 的各种组合单芯片方案，可助力实现低功耗、丰
+富功能、体积小等需求的物联网应用。提供 1x1 SISO 和2x2 MIMO 等组合的Wi-Fi+BT
+combo 方案。该芯片均可搭配英飞凌及其它厂商的 MCU 或者 MPU 实现完备的主控
++Wi-Fi+蓝牙系统。
+CYW55512/3 是超低功耗的Wi-Fi 6(802.11ax)加蓝牙6.0 的组合芯片，支持 2.4GHz
+和5GHz Wi-Fi或者 6GHz Wi-Fi，支持经典蓝牙及低功耗蓝牙，采用超低功耗设计，适
+用于低功耗、小尺寸、功能丰富的物联网应用。Edgi Talk 开发板上已包含该组合芯片。
+CYW43012 是超低功耗的 Wi-Fi 4(802.11n)加蓝牙 5.4 的组合芯片，支持 1x1 的
+2.4GHz 和 5GHz Wi-Fi，支持经典蓝牙及低功耗蓝牙，采用超低功耗设计，适用于低功
+耗、小尺寸、功能丰富的物联网应用。搭配 PSoC6 开发板，可选配集成了该组合芯片
+的Wi-Fi模块。
+⚫ 其它推荐使用的选配传感器：XENSIV Sensors
+XENSIV 系列传感器包括有雷达传感器，比如 BGT60TR13C 等，其可搭配英飞凌的
+MCU 或者其他厂商的 MCU 进行算法开发，应用于感知、监测等场景。CO2 传感器，
+3英飞凌赛题选题指南
+比如PASCO2V15，可以检测从0ppm到32000ppm的二氧化碳浓度。XENSIV系列传感
+器还包括压力传感器，如 DPS368；MEMS 麦克风，如IM72D128 等。
+4英飞凌赛题选题指南
+三、 选题方向
+⚫ 选题一：嵌入式人工智能， Edge AI
+本选题主控需选用 PSOC Edge 系列微处理器。无线连接建议选用 AIROC Wireless
+如 CYW55512/3 无线模块（推荐的开发板上已集成该模块）；选用传感器时，建议但
+不强制选用 XENSIV Sensors 中的传感器（推荐的开发板上集成了硅 MIC，Speaker，
+AHT20，TFT）。参赛队伍可以根据作品的规划，选配合适的外设，设计边缘智能终
+端，包括但不限于如下方向：
+✓ 智慧医疗健康监测
+✓ 智能语音交互生态
+✓ 智能家居与家电 HMI
+✓ 智能安防与监控
+✓ 母婴与养老照护
+✓ 专业级可穿戴设备
+嵌入式 AI 的开发工具链推荐但不限于：ModusToolBox, DEEPCRAFT Studio, VS
+Code, RT-Thread AI SDK。
+选题重点关注技术点：
+✓ 功能复杂性：CPU、NPU 及 DSP 协同工作情况；边缘 AI 设计、性能指标、部
+署及资源消耗；嵌入式物联网功能；外设功能的丰富性等
+✓ 作品接近工程样机的程度
+✓ 功耗/续航能力，考虑实际产品的落地需求
+✓ 作品的专业性、实用性、创新性等
+⚫ 选题二：嵌入式物联网应用，IoT
+本选题主控需要选用 PSoC6 系列微处理器。无线连接建议使用 CYW43012无线模
+块或其它 AIROC Wi-Fi 和蓝牙模块；选用传感器时，建议但不强制选用 XENSIV
+Sensors 中的传感器。本选题应用方向建议设计嵌入式通信终端/IoT 终端，包括但不限
+于如下方向：
+✓ 智能穿戴
+✓ 智能家电
+✓ 智慧医疗
+5英飞凌赛题选题指南
+✓ 环境监测系统
+✓ 无线连接系统
+选题重点关注技术点：
+✓ 功能复杂性：如集成数据采集，数据处理，识别算法等功能进行环境、状态感
+知；通过 CapSense、TFT 或 OLED 或 LCD 等进行人机交互；通过 Wi-Fi、BLE
+等进行物联网连接等，进而实现复杂的系统应用
+✓ 作品接近工程样机的程度
+✓ 功耗/续航能力，考虑实际产品的落地需求
+✓ 作品的专业性、实用性、创新性等
+⚫ 选题方向三：工业应用
+本选题主控需选用 XMC7000 系列。选用传感器时，建议但不强制选用 XENSIV
+Sensors中的传感器。参考应用包括但不限于：
+✓ 机器人、机械臂等伺服电机控制
+✓ 叉车、工程车应用
+✓ 工业机床的 HMI应用
+✓ 数字电源，微型逆变器应用
+⚫ 自主选题
+参赛队伍自主选题，要求主控平台基于 PSoC Edge、PSoC6 或者XMC7000。
+6英飞凌赛题选题指南
+四、 开发板获取途径
+⚫ 参赛队伍可以采用付押金借用开发板，赛后归还开发板，平台退还押金的方式获取
+开发板：
+1.PSOC Edge: Edgi Talk
+https://item.taobao.com/item.htm?ft=t&id=1015914924486
+2.PSoC 62 WITH CAPSENSE EVALUATION KIT ：
+https://item.taobao.com/item.htm?ft=t&id=894802386964
+7英飞凌赛题选题指南
+3.XMC7000系列：XMC7100 EVK
+https://item.taobao.com/item.htm?ft=t&id=896196644440
+⚫ 参赛队伍也可以选择其它非免费平台，不退费。
+英飞凌官方天猫旗舰店：
+https://infineon.world.tmall.com/shop/view_shop.htm?spm=a21n57.shop_search.0.0.7dbc488
+308636f
+自制开发板不得出现出现学校、老师或学生姓名等敏感信息，需在电路板丝印层印
+制大赛口号"AI for Design, Design for AI"和加工时间。
+8英飞凌赛题选题指南
+五、 技术支持与技术资源
+⚫ 英飞凌官方支持网址连接
+英飞凌社区论坛-大学生嵌入式大赛板块：
+https://community.infineon.com/t5/%E5%A4%A7%E5%AD%A6%E7%94%9F%E5%B5%8
+C%E5%85%A5%E5%BC%8F%E5%A4%A7%E8%B5%9B/bd-p/studentcompetition/page/1
+英飞凌社区论坛英文：https://community.infineon.com/?profile.language=en
+英飞凌社区论坛中文：
+https://community.infineon.com/?category.id=CN&profile.language=zh-CN
+21ic英飞凌MCU论坛：https://bbs.21ic.com/iclist-59-1.html
+⚫ 常用链接
+英飞凌官网：https://www.infineon.com
+PSOC Edge产品官网：https://www.infineon.com/products/microcontroller/32-bit-psoc-
+arm-cortex/32-bit-psoc-edge-arm/psoc-edge-e84
+PSoC6产品官网：https://www.infineon.com/cms/en/product/microcontroller/32-bit-
+psoc-arm-cortex-microcontroller/psoc-6-32-bit-arm-cortex-m4-mcu/
+XMC7000产品官网：https://www.infineon.com/cms/en/product/microcontroller/32-bit-
+industrial-microcontroller-based-on-arm-cortex-m/32-bit-xmc7000-industrial-microcontroller-
+arm-cortex-m7/
+AIROC Wireless官网：https://www.infineon.com/cms/en/product/wireless-connectivity/
+XENSIV sensors官网：https://www.infineon.com/cms/en/product/sensor/
+Edge AI Imagimob: https://www.imagimob.com/
+⚫ IDE & SDK
+IDE ModusToolBox下载：https://www.infineon.com/cms/en/design-
+support/tools/sdk/modustoolbox-software/
+RT-Thread Studio下载：https://www.rt-thread.org/studio.html
+Edge AI DEEPCRAFT Studio: https://www.imagimob.com/
+Visual Studio Code: https://code.visualstudio.com/download
+Github’s Infineon SDK: https://github.com/Infineon
+Github’s RT-Thread SDK: https://github.com/RT-Thread/rt-thread
+PS-Micro XMC7100 文档等链接：https://gitee.com/ps-
+micro/infineon_xmc7100_carrier_board
+9英飞凌赛题选题指南
+⚫ 技术合作伙伴
+RT-Thread社区：https://club.rt-thread.org/index.html
+RT-Thread官网：https://www.rt-thread.org/
+RT-Thread Edgi Talk EVK SDK: https://github.com/RT-Thread-Studio/sdk-bsp-
+psoc_e84-edgi-talk
+RT-Thread SDK’s Infineon BSP:
+https://github.com/RT-Thread/rt-thread/tree/master/bsp/Infineon
+PS-Micro XMC7100: https://gitee.com/ps-micro/infineon_xmc7100_carrier_board
+⚫ 基于PSOC Edge, PSoC6和XMC7000的英飞凌官方开发板（不免费提供）
+KIT_PSE84_AI: https://www.infineon.com/product-information/kit_pse84_ai
+KIT_PSE84_EVAL: https://www.infineon.com/product-information/kit_pse84_eval
+CY8CKIT-062S2-43012: https://www.infineon.com/cms/en/product/evaluation-
+boards/cy8ckit-062s2-43012/
+KIT_XMC72_EVK: https://www.infineon.com/cms/en/product/evaluation-
+boards/kit_xmc72_evk/
+CYW43012 adaptor for PSoC62 With Capsense Evaluation Kit的原理图可以从如下连
+接找到： https://bbs.21ic.com/icview-3356478-1-1.html?#pid13972848
+⚫ 开发板相关技术链接
+PSOC Edge: Edgi Talk:
+https://github.com/RT-Thread-Studio/sdk-bsp-psoc_e84-edgi-
+talk/tree/main/docs/board/PSOC-Edge-E84
+PSoC62 With Capsense Evaluation KIT:
+https://github.com/RT-Thread-Studio/sdk-bsp-cy8c624-infineon-
+evaluationkit/blob/main/documents/IFX-PSoC6-RT-Thread-sch.pdf
+芯启XMC7100主板：
+https://gitee.com/ps-micro/infineon_xmc7100_carrier_board
+10英飞凌赛题选题指南
+六、 其它
+本赛道要求参赛队的主要任务代码开源（开源协议不限），推荐将代码发布
+于个人Github或者Gitee等平台；演示视频推荐以个人账号发布于Bilibili等平台；
+产品的设计说明等建议上传到英飞凌官方论坛的嵌入式大赛板块，并在论坛上发
+布代码或视频的链接地址。参赛作品知识产权归属作者所有，英飞凌享有对参赛
+作品进行展示和其他形式宣传的权益。
+欢迎关注英飞凌官方微信公众号：
+11
