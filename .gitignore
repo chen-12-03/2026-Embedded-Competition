@@ -1,0 +1,20 @@
+# ===== External/local resources (do NOT commit) =====
+embedded_drivers/
+官方资料/
+
+# ===== Temporary / office lock files =====
+~$*
+*.tmp
+*.swp
+*.swo
+.DS_Store
+
+# ===== Python =====
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# ===== Build / logs =====
+build/
+dist/
+*.log
