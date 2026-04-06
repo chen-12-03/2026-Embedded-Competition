@@ -19,6 +19,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "i2c.h"
+#include "mpu6050.h"
 #include "uart.h"
 #include "gpio.h"
 
@@ -48,6 +49,9 @@
 
 /* USER CODE BEGIN PV */
 
+static MPU6050_HandleTypeDef hmpu6050;
+static uint32_t last_mpu6050_tick = 0U;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -58,6 +62,21 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+static void MPU6050_LogRaw(void)
+{
+  if (MPU6050_ReadRaw(&hmpu6050) == HAL_OK)
+  {
+    printf("AX:%d AY:%d AZ:%d GX:%d GY:%d GZ:%d T:%d\r\n",
+           hmpu6050.ax,
+           hmpu6050.ay,
+           hmpu6050.az,
+           hmpu6050.gx,
+           hmpu6050.gy,
+           hmpu6050.gz,
+           hmpu6050.temp);
+  }
+}
 
 /* USER CODE END 0 */
 
@@ -93,29 +112,28 @@ int main(void)
   MX_I2C1_Init();
   UART1_Init();
   /* USER CODE BEGIN 2 */
-  printf("\r\nUART test start\r\n");
+  if (MPU6050_InitAuto(&hmpu6050, &hi2c1) != HAL_OK)
+  {
+    printf("MPU6050 init failed\r\n");
+    Error_Handler();
+  }
+  printf("MPU6050 found at 0x%02X\r\n", hmpu6050.address);
+  printf("MPU6050 raw data stream start\r\n");
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  uint32_t last_tick = HAL_GetTick();
+  last_mpu6050_tick = HAL_GetTick();
   while (1)
   {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    uint8_t ch;
-
-    while (UART1_Read(&ch, 1U) == 1U)
+    if ((HAL_GetTick() - last_mpu6050_tick) >= 50U)
     {
-      printf("echo: %c\r\n", ch);
-    }
-
-    if ((HAL_GetTick() - last_tick) >= 1000U)
-    {
-      last_tick = HAL_GetTick();
-      printf("uart alive\r\n");
+      last_mpu6050_tick = HAL_GetTick();
+      MPU6050_LogRaw();
     }
 
     HAL_Delay(10);
