@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RV1126 产线监控与联调看板</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+</head>
+<body data-page="{{ page|default('monitor') }}">
+  <div class="app-shell">
+    <header class="hero-panel">
+      <div class="hero-copy">
+        <nav class="view-nav">
+          <a class="view-link {% if (page|default('monitor')) == 'monitor' %}active{% endif %}" href="{{ url_for('dashboard') }}">总览页</a>
+          <a class="view-link {% if (page|default('monitor')) == 'debug' %}active{% endif %}" href="{{ url_for('debug_dashboard') }}">联调页</a>
+        </nav>
+        <p class="eyebrow">RV1126 Smart Sorting Dashboard</p>
+        <h1>{% if (page|default('monitor')) == 'debug' %}联调与日志工作台{% else %}产线监控总览{% endif %}</h1>
+        <p class="hero-text">
+          {% if (page|default('monitor')) == 'debug' %}
+          集中查看原始采样、控制入口、状态上下文和历史日志，方便现场联调。
+          {% else %}
+          聚焦展示 NFC 采样、视觉识别、比对结论和设备状态，适合答辩和现场演示。
+          {% endif %}
+        </p>
+      </div>
+      <div class="hero-side">
+        <div class="status-card">
+          <span class="status-label">系统状态</span>
+          <strong id="heroSystemStatus">--</strong>
+          <span class="status-chip neutral" id="heroHealthBadge">等待数据</span>
+          <span class="hero-meta" id="heroMetaLine">最近刷新: --</span>
+        </div>
+        <div class="action-strip">
+          <button class="ghost-button" id="refreshButton" type="button">立即刷新</button>
+          <button class="ghost-button" id="nfcSampleButton" type="button">NFC 采样</button>
+          <button class="ghost-button" id="previewToggleButton" type="button">关闭画面</button>
+          <button class="ghost-button" id="startButton" type="button">启动设备</button>
+          <button class="ghost-button" id="stopButton" type="button">停止设备</button>
+          <button class="ghost-button" id="resetButton" type="button">复位告警</button>
+        </div>
+      </div>
+    </header>
+
+    <section class="metrics-grid">
+      <article class="metric-card">
+        <span class="metric-label">处理记录</span>
+        <strong class="metric-value" id="metricTotalOrders">0</strong>
+        <span class="metric-note">累计历史记录数</span>
+      </article>
+      <article class="metric-card">
+        <span class="metric-label">检测通过</span>
+        <strong class="metric-value" id="metricPassed">0</strong>
+        <span class="metric-note">一致性放行件数</span>
+      </article>
+      <article class="metric-card">
+        <span class="metric-label">异常分拣</span>
+        <strong class="metric-value" id="metricAnomaly">0</strong>
+        <span class="metric-note">拨入异常区件数</span>
+      </article>
+      <article class="metric-card">
+        <span class="metric-label">待人工处理</span>
+        <strong class="metric-value" id="metricManual">0</strong>
+        <span class="metric-note">需要人工复核</span>
+      </article>
+      <article class="metric-card">
+        <span class="metric-label">累计决策</span>
+        <strong class="metric-value" id="metricDecisions">0</strong>
+        <span class="metric-note">本次运行决策总数</span>
+      </article>
+      <article class="metric-card">
+        <span class="metric-label">历史总数</span>
+        <strong class="metric-value" id="metricProcessed">0</strong>
+        <span class="metric-note">用于回看最近处理情况</span>
+      </article>
+    </section>
+
+    <section class="main-grid monitor-only">
+      <article class="panel stage-panel">
+        <div class="panel-header">
+          <div>
+            <p class="panel-kicker">展示区</p>
+            <h2>实时摄像头 / 最近抓拍</h2>
+          </div>
+          <div class="stage-meta">
+            <span class="status-chip neutral" id="stageModeChip">等待画面</span>
+            <span class="panel-time" id="latestCheckedAt">--</span>
+          </div>
+        </div>
+        <div class="stage-frame">
+          <img id="capturePreview" alt="最近一次检测抓拍" hidden>
+          <div class="stage-fallback" id="captureFallback">
+            <strong id="captureFallbackTitle">暂无摄像头画面</strong>
+            <span id="captureFallbackText">正在等待实时预览或最近抓拍图像。</span>
+          </div>
+        </div>
+        <div class="stage-summary">
+          <div class="summary-item">
+            <span>最近物料 ID</span>
+            <strong id="latestMaterialId">--</strong>
+          </div>
+          <div class="summary-item">
+            <span>分拣路线</span>
+            <strong id="latestRoute">--</strong>
+          </div>
+          <div class="summary-item">
+            <span>判定状态</span>
+            <strong id="latestDecisionStatus">--</strong>
+          </div>
+          <div class="summary-item">
+            <span>当前模式</span>
+            <strong id="latestMode">--</strong>
+          </div>
+        </div>
+      </article>
+
+      <div class="stack-grid">
+        <article class="panel signal-panel">
+          <div class="panel-header compact">
+            <div>
+              <p class="panel-kicker">感知链路</p>
+              <h2>NFC 采样读取</h2>
+            </div>
+            <span class="status-chip neutral" id="nfcStatusChip">等待数据</span>
+          </div>
+          <div class="tag-row" id="nfcMetaTags"></div>
+          <div class="info-grid">
+            <div class="info-row"><span>物料 ID</span><strong id="nfcMaterialId">--</strong></div>
+            <div class="info-row"><span>标签文本</span><strong id="nfcTextContent">--</strong></div>
+            <div class="info-row"><span>读取结果</span><strong id="nfcResultText">--</strong></div>
+            <div class="info-row"><span>采样时间</span><strong id="nfcSampleTime">--</strong></div>
+            <div class="info-row"><span>错误信息</span><strong id="nfcErrorText">--</strong></div>
+          </div>
+        </article>
+
+        <article class="panel signal-panel">
+          <div class="panel-header compact">
+            <div>
+              <p class="panel-kicker">视觉链路</p>
+              <h2>视觉分类显示</h2>
+            </div>
+            <span class="status-chip neutral" id="visionStatusChip">等待数据</span>
+          </div>
+          <div class="tag-row" id="visionTagRow"></div>
+          <div class="info-grid">
+            <div class="info-row"><span>联合标签</span><strong id="visionLabel">--</strong></div>
+            <div class="info-row"><span>颜色</span><strong id="visionColor">--</strong></div>
+            <div class="info-row"><span>形状</span><strong id="visionShape">--</strong></div>
+            <div class="info-row"><span>材质</span><strong id="visionType">--</strong></div>
+            <div class="info-row"><span>总体置信度</span><strong id="visionConfidence">--</strong></div>
+            <div class="info-row"><span>细节说明</span><strong id="visionDetailsText">--</strong></div>
+          </div>
+        </article>
+
+        <article class="panel compare-panel">
+          <div class="panel-header compact">
+            <div>
+              <p class="panel-kicker">判定链路</p>
+              <h2>订单 / NFC / 视觉一致性结果</h2>
+            </div>
+            <span class="status-chip neutral" id="comparisonStatusChip">等待数据</span>
+          </div>
+          <div class="compare-verdict neutral" id="comparisonVerdictCard">
+            <span class="compare-verdict-label">订单、NFC 与视觉一致性</span>
+            <strong id="comparisonVerdictText">等待判定</strong>
+            <span id="comparisonVerdictDetail">需要先拿到订单目标、NFC 文本和视觉结果。</span>
+          </div>
+          <div class="compare-signal-grid">
+            <div class="compare-signal-card">
+              <span>订单目标</span>
+              <strong id="comparisonOrderSignal">--</strong>
+            </div>
+            <div class="compare-signal-card">
+              <span>NFC 文本</span>
+              <strong id="comparisonNfcSignal">--</strong>
+            </div>
+            <div class="compare-signal-card">
+              <span>视觉结果</span>
+              <strong id="comparisonVisionSignal">--</strong>
+            </div>
+            <div class="compare-signal-card">
+              <span>一致性结论</span>
+              <strong id="comparisonMatchSignal">--</strong>
+            </div>
+          </div>
+          <div class="compare-headline">
+            <strong id="comparisonHeadline">等待检测结果</strong>
+            <span id="comparisonReason">暂无比对说明</span>
+          </div>
+          <div class="tag-row" id="comparisonReasonTags"></div>
+          <div class="compare-matrix" id="comparisonMatrix"></div>
+          <div class="spec-grid">
+            <div class="spec-card">
+              <h3>目标参数</h3>
+              <div id="expectedSpec"></div>
+            </div>
+            <div class="spec-card">
+              <h3>视觉结果</h3>
+              <div id="actualSpec"></div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="overview-grid monitor-only">
+      <article class="panel">
+        <div class="panel-header compact">
+          <div>
+            <p class="panel-kicker">订单链路</p>
+            <h2>订单队列输入与逐项校验</h2>
+          </div>
+          <span class="status-chip neutral" id="orderRequirementChip">未启用</span>
+        </div>
+        <form class="debug-form" id="orderRequirementForm">
+          <div class="switch-row">
+            <label class="inline-switch" for="orderRequirementEnabled">
+              <input id="orderRequirementEnabled" name="enabled" type="checkbox">
+              <span>启用订单校验</span>
+            </label>
+          </div>
+          <label>订单表格</label>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>序号</th>
+                  <th>订单文本</th>
+                  <th>解析结果</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="orderRequirementRows">
+                <tr>
+                  <td>1</td>
+                  <td>
+                    <input
+                      class="order-row-input"
+                      name="text"
+                      type="text"
+                      placeholder="例如 黄色正方形 或 {&quot;color&quot;:&quot;黄色&quot;,&quot;shape&quot;:&quot;正方形&quot;}"
+                    >
+                  </td>
+                  <td>--</td>
+                  <td><button type="button" class="order-remove-button">删除</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="form-row">
+            <button type="button" id="orderRequirementAddRow">新增一行</button>
+            <button type="submit">保存订单队列</button>
+          </div>
+        </form>
+        <div class="tag-row" id="orderRequirementTags"></div>
+        <div class="info-grid">
+          <div class="info-row"><span>当前执行订单</span><strong id="orderRequirementTextView">--</strong></div>
+          <div class="info-row"><span>目标材质</span><strong id="orderRequirementType">--</strong></div>
+          <div class="info-row"><span>目标颜色</span><strong id="orderRequirementColor">--</strong></div>
+          <div class="info-row"><span>目标形状</span><strong id="orderRequirementShape">--</strong></div>
+          <div class="info-row"><span>待处理订单数</span><strong id="orderRequirementPendingCount">--</strong></div>
+          <div class="info-row"><span>历史订单数</span><strong id="orderRequirementHistoryCount">--</strong></div>
+          <div class="info-row"><span>最近更新时间</span><strong id="orderRequirementUpdatedAt">--</strong></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>历史订单</th>
+                <th>结果</th>
+                <th>完成时间</th>
+                <th>备注</th>
+              </tr>
+            </thead>
+            <tbody id="orderRequirementHistoryBody">
+              <tr>
+                <td colspan="4" class="empty-cell">暂无订单历史</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="panel">
+        <div class="panel-header compact">
+          <div>
+            <p class="panel-kicker">设备状态</p>
+            <h2>传送带 / 舵机 / 健康监测</h2>
+          </div>
+          <span class="status-chip neutral" id="deviceHealthChip">等待数据</span>
+        </div>
+        <div class="info-grid">
+          <div class="info-row"><span>传送带</span><strong id="deviceConveyorState">--</strong></div>
+          <div class="info-row"><span>传送速度</span><strong id="deviceConveyorSpeed">--</strong></div>
+          <div class="info-row"><span>舵机角度</span><strong id="deviceServoAngle">--</strong></div>
+          <div class="info-row"><span>运行状态</span><strong id="deviceRunningText">--</strong></div>
+          <div class="info-row"><span>振动后端</span><strong id="deviceVibrationBackend">--</strong></div>
+          <div class="info-row"><span>振动读数</span><strong id="deviceVibration">--</strong></div>
+          <div class="info-row"><span>振动等级</span><strong id="deviceVibrationLevel">--</strong></div>
+          <div class="info-row"><span>振动均值</span><strong id="deviceVibrationAverage">--</strong></div>
+          <div class="info-row"><span>电流读数</span><strong id="deviceCurrent">--</strong></div>
+          <div class="info-row"><span>最近停机原因</span><strong id="deviceStopReason">--</strong></div>
+          <div class="info-row"><span>最近停机详情</span><strong id="deviceStopReasonDetails">--</strong></div>
+          <div class="info-row"><span>最近停机时间</span><strong id="deviceStopAt">--</strong></div>
+          <div class="info-row"><span>健康采样时间</span><strong id="deviceHealthSampledAt">--</strong></div>
+        </div>
+        <div class="tag-row" id="deviceReasonTags"></div>
+      </article>
+    </section>
+
+    <section class="aux-grid debug-only">
+      <article class="panel">
+        <div class="panel-header compact">
+          <div>
+            <p class="panel-kicker">感知链路</p>
+            <h2>NFC 与视觉原始信息</h2>
+          </div>
+          <span class="panel-time">实时调试上下文</span>
+        </div>
+        <div class="spec-grid">
+          <div class="spec-card">
+            <h3>NFC 原始采样</h3>
+            <pre class="json-box raw-box" id="nfcPayloadDebug">暂无 NFC 原始数据</pre>
+          </div>
+          <div class="spec-card">
+            <h3>视觉原始结果</h3>
+            <pre class="json-box raw-box" id="visionPayloadDebug">暂无视觉原始数据</pre>
+          </div>
+        </div>
+      </article>
+
+      <article class="panel debug-context-panel">
+        <div class="panel-header compact">
+          <div>
+            <p class="panel-kicker">调试信息</p>
+            <h2>自检结果与原始上下文</h2>
+          </div>
+          <span class="panel-time" id="statePathText">状态文件: --</span>
+        </div>
+        <div class="feedback-box" id="actionFeedback">等待联调操作</div>
+        <div class="startup-list" id="startupChecks"></div>
+        <pre class="json-box debug-json" id="debugPayload">暂无调试上下文</pre>
+      </article>
+    </section>
+
+    <section class="panel history-panel debug-only">
+      <div class="panel-header compact">
+        <div>
+          <p class="panel-kicker">历史记录</p>
+          <h2>最近处理记录</h2>
+        </div>
+        <span class="panel-time" id="historyCountText">0 条</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>时间</th>
+              <th>物料 ID</th>
+              <th>NFC</th>
+              <th>视觉</th>
+              <th>判定</th>
+              <th>路线</th>
+              <th>原因</th>
+            </tr>
+          </thead>
+          <tbody id="historyTableBody">
+            <tr>
+              <td colspan="7" class="empty-cell">等待处理记录</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    window.dashboardConfig = {
+      page: "{{ page|default('monitor') }}",
+      dashboardUrl: "{{ url_for('get_dashboard') }}",
+      cameraControlUrl: "{{ url_for('control_camera_preview') }}",
+      cameraStatusUrl: "{{ url_for('get_camera_status') }}",
+      nfcStatusUrl: "{{ url_for('get_nfc_status') }}",
+      nfcSampleUrl: "{{ url_for('sample_nfc_once') }}",
+      orderRequirementUrl: "{{ url_for('set_order_requirement') }}",
+      captureUrl: "{{ url_for('get_latest_capture') }}",
+      startUrl: "{{ url_for('start_system') }}",
+      stopUrl: "{{ url_for('stop_system') }}",
+      resetUrl: "{{ url_for('reset_system') }}"
+    };
+  </script>
+  <script src="{{ url_for('static', filename='dashboard.js') }}" defer></script>
+</body>
+</html>

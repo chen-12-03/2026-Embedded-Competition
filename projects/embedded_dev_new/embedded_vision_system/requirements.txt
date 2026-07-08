@@ -1,0 +1,20 @@
+# Python 依赖
+
+# 基础依赖
+opencv-python>=4.5.0
+numpy>=1.19.0
+
+# RKNN 推理库（需要在 RV1126 开发板上安装）
+# 通常已预装在开发板中，如未安装请参考官方文档
+# rknnlite  # 注释掉，因为通常由开发板提供
+
+# 日志和工具
+python-dateutil>=2.8.0
+
+# Web 服务
+Flask>=2.0.0
+
+# 可选依赖（用于高级功能）
+# smbus2>=0.4.0        # 用于 PN532 I2C / MPU6050 I2C
+# requests>=2.25.0     # 用于 HTTP 请求
+# Pillow>=8.0.0        # 用于图像处理
