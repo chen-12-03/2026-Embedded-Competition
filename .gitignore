@@ -1,0 +1,13 @@
+# Root workspace ignores
+
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.tmp
+*.swp
+*.swo
+*.log
+.DS_Store
+~$*
+backups/
+*:Zone.Identifier
